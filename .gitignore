@@ -1,6 +1,8 @@
 /node_modules
 /dist
 /lambda.zip
-/terraform/lambda_package.zip
-!.terraform/
-.env
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.zip
