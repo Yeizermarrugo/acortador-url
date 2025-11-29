@@ -1,0 +1,29 @@
+{
+    "name": "acortador-url",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "ts-node src/*.ts",
+        "build:shorten": "esbuild src/handler.ts --bundle --platform=node --target=node20 --outdir=dist",
+        "build:redirect": "esbuild src/redirect_handler.ts --bundle --platform=node --target=node20 --minify --outfile=dist/redirect_handler.js",
+        "build": "npm run build:shorten && npm run build:redirect"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.159",
+        "@types/node": "^24.10.1",
+        "esbuild": "^0.27.0",
+        "nodemon": "^3.1.11",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.940.0",
+        "@aws-sdk/lib-dynamodb": "^3.940.0"
+    }
+}

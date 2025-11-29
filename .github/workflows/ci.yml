@@ -1,0 +1,66 @@
+# .github/workflows/deploy.yml
+
+name: Deploy URL Shortener to AWS
+
+on:
+  push:
+    branches:
+      - main # Se ejecuta en cada push a la rama principal
+
+env:
+  # Variable de entorno para la región de AWS que usará Terraform
+  AWS_REGION: us-east-1 
+  # Carpeta donde se encuentra el código de Terraform
+  TF_WORKING_DIR: terraform 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Configurar Node.js y compilar el código de la Lambda
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies and build code (esbuild)
+        run: |
+          npm install
+          npm run build
+        # El comando 'npm run build' ahora funciona y deja el archivo en 'dist/handler.js'
+
+      # 3. Configurar Credenciales de AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 4. Configurar Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 5. Inicializar Terraform
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        
+      # 6. Validar la sintaxis de Terraform
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      # 7. Planificar y Aplicar los cambios
+      # Esto solo se ejecuta si la rama es 'main'
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve
+        working-directory: ${{ env.TF_WORKING_DIR }}
